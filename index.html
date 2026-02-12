@@ -3,52 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basidi Live - تحميل التطبيق الرسمي</title>
+    <title>تحميل Basidi Live - النسخة الرسمية</title>
     <style>
         :root { --gold: #ffcc00; --bg: #000; --blue: #051630; }
         body { margin: 0; background: var(--bg); color: white; font-family: system-ui, sans-serif; text-align: center; }
-        .header { background: var(--blue); padding: 45px 20px; border-bottom: 3px solid var(--gold); }
-        h1 { color: var(--gold); font-size: 2.8rem; margin: 0; text-shadow: 0 0 10px rgba(255,204,0,0.3); }
-        .hero-img { width: 80%; max-width: 300px; border-radius: 30px; border: 4px solid #222; margin: 30px 0; }
-        .features { padding: 20px; max-width: 450px; margin: auto; }
-        .f-box { background: #111; padding: 15px; border-radius: 12px; border-right: 5px solid var(--gold); text-align: right; margin-bottom: 12px; display: flex; align-items: center; }
-        .f-box img { width: 40px; margin-left: 15px; }
-        .download-section { background: #080808; padding: 50px 20px; border-top: 1px solid #222; margin-top: 20px; }
-        .download-btn { 
-            display: inline-block; background: var(--gold); color: #000; padding: 20px 70px; 
-            border-radius: 50px; font-size: 1.6rem; font-weight: bold; text-decoration: none;
-            box-shadow: 0 10px 25px rgba(255,204,0,0.5); transition: 0.3s;
-        }
-        .download-btn:hover { transform: scale(1.05); background: #fff; }
+        .header { background: var(--blue); padding: 25px; border-bottom: 3px solid var(--gold); }
+        h1 { color: var(--gold); margin: 0; font-size: 1.8rem; }
+        .gallery { padding: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; max-width: 500px; margin: auto; }
+        .gallery img { width: 100%; border-radius: 10px; border: 1px solid #333; }
+        .main-preview { width: 90%; max-width: 350px; border-radius: 15px; margin: 20px 0; border: 2px solid var(--gold); }
+        .download-area { background: #0a0a0a; padding: 30px 15px; margin-top: 20px; }
+        .btn { display: inline-block; background: var(--gold); color: #000; padding: 15px 40px; border-radius: 50px; font-weight: bold; text-decoration: none; font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
     <div class="header">
         <h1>Basidi Live</h1>
-        <p>تطبيق المشاهدة المباشرة الأقوى لعام 2026</p>
+        <p>البث المباشر لجميع القنوات</p>
     </div>
 
-    <div class="features">
-        <div class="f-box">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/BeIN_Sports_logo.svg/512px-BeIN_Sports_logo.svg.png" alt="beIN">
-            <span>شاهد جميع قنوات beIN SPORTS بجودات متعددة</span>
-        </div>
-        <div class="f-box">
-            <img src="https://img.icons8.com/color/144/morocco.png" alt="Maroc">
-            <span>الباقة المغربية كاملة بتنظيم احترافي</span>
-        </div>
+    <p style="margin-top: 20px;">لقطات من داخل التطبيق:</p>
+    
+    <div class="gallery">
+        <img src="Screenshot_20260211_224531_basidliive.aotu.jpg" alt="القائمة الرئيسية">
+        <img src="Screenshot_20260211_224544_basidliive.aotu.jpg" alt="القنوات المغربية">
+        <img src="Screenshot_20260211_224611_basidliive.aotu.jpg" alt="باقة beIN">
+        <img src="Screenshot_20260211_224633_basidliive.aotu.jpg" alt="باقة شاهد">
     </div>
 
-    <img src="https://via.placeholder.com/300x600/151515/ffcc00?text=Basidi+Live+UI" class="hero-img" alt="واجهة التطبيق">
-
-    <div class="download-section">
-        <p style="margin-bottom:25px; font-size: 1.1rem;">جاهز للمشاهدة؟ حمل التطبيق الآن</p>
-        <a href="https://www.mediafire.com/file/4lh1xbg2ydr7o9y/Basidi.live+.apk/file" class="download-btn">تحميل APK</a>
+    <div class="download-area">
+        <p>جاهز للمشاهدة؟</p>
+        <a href="https://www.mediafire.com/file/4lh1xbg2ydr7o9y/Basidi.live+.apk/file" class="btn">تحميل APK الآن</a>
     </div>
 
-    <footer style="padding: 40px; font-size: 0.9rem; color: #444;">
-        تم التطوير بواسطة Basidibloge © 2026
+    <footer style="padding: 20px; color: #555; font-size: 0.8rem;">
+        Basidi Live © 2026 - جميع الحقوق محفوظة
     </footer>
 
 </body>
