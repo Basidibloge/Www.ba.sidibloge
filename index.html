@@ -3,87 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BASIDI V6 ELITE</title>
+    <title>BASIDI V6 MANUAL</title>
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
-        :root { --red: #e31e24; --bg: #0a0a0a; --card: #161616; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; text-align: center; }
-        header { background: #000; padding: 15px; border-bottom: 3px solid var(--red); position: sticky; top:0; z-index: 100; }
-        .main-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .category-card { background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 25px 10px; cursor: pointer; transition: 0.3s; }
-        .category-card i { font-size: 40px; color: var(--red); display: block; margin-bottom: 10px; }
-        
-        #channel-list { display: none; padding: 20px; }
-        .items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .item { background: var(--card); border-radius: 10px; padding: 15px; border: 1px solid #333; }
-        .item i { font-size: 30px; color: var(--red); }
-        .play-btn { background: var(--red); color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; margin-top: 10px; cursor: pointer; font-weight: bold; }
-        
-        #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
-        video { width: 100%; height: auto; flex-grow: 1; background: #000; }
-        .close-btn { background: #333; color: white; border: none; padding: 15px; width: 100%; font-size: 18px; }
+        body { background: #0a0a0a; color: white; font-family: sans-serif; text-align: center; margin: 0; }
+        header { background: #000; padding: 20px; border-bottom: 3px solid #e31e24; }
+        .container { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .chan-card { background: #161616; border: 1px solid #333; padding: 20px; border-radius: 10px; cursor: pointer; }
+        .chan-card:hover { border-color: #e31e24; }
+        #player-box { display: none; position: fixed; inset: 0; background: #000; z-index: 100; flex-direction: column; }
+        video { width: 100%; height: 80vh; background: #000; }
+        .btn-close { background: #e31e24; color: white; border: none; padding: 15px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-<div id="player-overlay">
-    <video id="basidi-video" controls autoplay playsinline></video>
-    <button class="close-btn" onclick="closePlayer()">✕ إغلاق المشغل</button>
+<div id="player-box">
+    <video id="video-player" controls autoplay></video>
+    <button class="btn-close" onclick="closeVideo()">✕ إغلاق القناة</button>
 </div>
 
-<header><h2>BASIDI <span style="color:var(--red)">V6</span> ELITE</h2></header>
+<header><h1>BASIDI <span style="color:#e31e24">V6</span> PRO</h1></header>
 
-<div id="main-ui" class="main-menu">
-    <div class="category-card" onclick="showChannels()"><i class='bx bx-play-circle'></i><span>قنوات مباشرة</span></div>
-    <div class="category-card" onclick="location.reload()"><i class='bx bx-refresh'></i><span>تحديث الموقع</span></div>
-</div>
-
-<div id="channel-list">
-    <button onclick="backToMenu()" style="color:white; background:var(--red); border:none; padding:10px 20px; border-radius:20px; margin-bottom:20px;">🔙 العودة</button>
-    <div class="items-grid">
-        <div class="item">
-            <i class='bx bx-tv'></i>
-            <p>قناة الرياضية 1</p>
-            <button class="play-btn" onclick="play('http://bufsetn.live:8080/live/VaRumDmgRh/hopeful5sex/123.ts')">▶ تشغيل</button>
-        </div>
-        <div class="item">
-            <i class='bx bx-tv'></i>
-            <p>قناة الأفلام</p>
-            <button class="play-btn" onclick="play('http://bufsetn.live:8080/live/VaRumDmgRh/hopeful5sex/456.ts')">▶ تشغيل</button>
-        </div>
-    </div>
+<div class="container">
+    <div class="chan-card" onclick="playChan('1500')">📺 قناة تجريبية 1</div>
+    <div class="chan-card" onclick="playChan('1501')">📺 قناة تجريبية 2</div>
+    <div class="chan-card" onclick="playChan('1502')">📺 قناة تجريبية 3</div>
+    <div class="chan-card" onclick="playChan('1503')">📺 قناة تجريبية 4</div>
 </div>
 
 <script>
-    let hls = new Hls();
+    const hls = new Hls();
+    const server = "http://bufsetn.live:8080";
+    const user = "VaRumDmgRh";
+    const pass = "hopeful5sex";
 
-    function showChannels() {
-        $("#main-ui").hide();
-        $("#channel-list").show();
-    }
+    function playChan(id) {
+        $("#player-box").css("display", "flex");
+        const video = document.getElementById('video-player');
+        const streamUrl = `${server}/live/${user}/${pass}/${id}.ts`;
 
-    function play(url) {
-        $("#player-overlay").css("display", "flex");
-        const v = document.getElementById('basidi-video');
         if (Hls.isSupported()) {
-            hls.destroy(); hls = new Hls();
-            hls.loadSource(url); hls.attachMedia(v);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
-        } else { v.src = url; v.play(); }
+            hls.destroy();
+            hls.loadSource(streamUrl);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        } else {
+            video.src = streamUrl;
+            video.play();
+        }
     }
 
-    function closePlayer() { 
-        const v = document.getElementById('basidi-video');
-        v.pause(); v.src = "";
-        $("#player-overlay").hide(); 
-        hls.destroy(); 
-    }
-
-    function backToMenu() { 
-        $("#channel-list").hide(); 
-        $("#main-ui").show(); 
+    function closeVideo() {
+        const video = document.getElementById('video-player');
+        video.pause();
+        hls.destroy();
+        $("#player-box").hide();
     }
 </script>
 </body>
