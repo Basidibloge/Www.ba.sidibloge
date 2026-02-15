@@ -9,7 +9,7 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
         :root { --red: #e31e24; --bg: #0a0a0a; --card: #161616; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; text-align: center; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; text-align: center; }
         header { background: #000; padding: 15px; border-bottom: 3px solid var(--red); }
         .main-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
         .category-card { background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 25px 10px; cursor: pointer; }
@@ -18,7 +18,7 @@
         .items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
         .item { background: var(--card); border-radius: 10px; padding: 10px; border: 1px solid #222; }
         .item img { width: 100%; height: 90px; object-fit: contain; }
-        .play-btn { background: var(--red); color: white; border: none; padding: 8px; width: 100%; border-radius: 5px; margin-top: 5px; cursor: pointer; }
+        .play-btn { background: var(--red); color: white; border: none; padding: 8px; width: 100%; border-radius: 5px; cursor: pointer; margin-top: 5px; }
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
         video { width: 100%; height: auto; background: #000; }
         .loading { display: none; color: var(--red); padding: 20px; font-weight: bold; }
@@ -40,17 +40,18 @@
     <div class="category-card" onclick="location.reload()"><i class='bx bx-refresh'></i><span>تحديث</span></div>
 </div>
 
-<div id="loader" class="loading">جاري الاتصال بالسيرفر...</div>
+<div id="loader" class="loading">جاري محاولة الاتصال بالسيرفر...</div>
 
 <div id="content-list">
-    <button onclick="backToMenu()" style="color:white; background:var(--red); border:none; padding:10px; margin-bottom:15px; border-radius:5px;">🔙 رجوع للقائمة</button>
+    <button onclick="backToMenu()" style="color:white; background:var(--red); border:none; padding:10px; margin-bottom:15px; border-radius:5px;">🔙 رجوع</button>
     <div id="items-container" class="items-grid"></div>
 </div>
 
 <script>
     const config = { h: "http://bufsetn.live:8080", u: "VaRumDmgRh", p: "hopeful5sex" };
-    // جسر بديل لتجاوز مشاكل الاتصال
-    const proxy = "https://api.allorigins.win/raw?url=";
+    
+    // استخدام وسيط AllOrigins مع إضافة timestamp لتجاوز الكاش
+    const proxy = "https://api.allorigins.win/get?url=";
     let hls = new Hls();
 
     async function fetchData(mode) {
@@ -61,22 +62,24 @@
         const apiUrl = `${config.h}/player_api.php?username=${config.u}&password=${config.p}&action=${action}`;
 
         try {
-            const resp = await fetch(proxy + encodeURIComponent(apiUrl));
-            if (!resp.ok) throw new Error();
-            const data = await resp.json();
+            const resp = await fetch(proxy + encodeURIComponent(apiUrl) + "&callback=?");
+            const result = await resp.json();
+            // AllOrigins يضع البيانات داخل حقل اسمه contents كسلسلة نصية
+            const data = JSON.parse(result.contents);
+            
             $("#loader").hide();
             $("#content-list").show();
             render(data, mode);
         } catch (e) {
             $("#loader").hide();
             $("#main-ui").show();
-            alert("خطأ: السيرفر لا يستجيب حالياً. حاول مرة أخرى.");
+            alert("السيرفر يرفض الاتصال المباشر. جرب تحديث الصفحة.");
         }
     }
 
     function render(data, mode) {
         let html = "";
-        data.slice(0, 60).forEach(item => {
+        data.slice(0, 40).forEach(item => {
             let img = item.stream_icon || item.cover || 'https://via.placeholder.com/100/222/white?text=BASIDI';
             html += `
                 <div class="item">
