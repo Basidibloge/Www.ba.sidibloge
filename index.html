@@ -9,39 +9,29 @@
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <style>
         :root { --red: #e31e24; --bg: #0a0a0a; --card: #161616; }
-        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
-        header { background: #000; padding: 15px; text-align: center; border-bottom: 3px solid var(--red); sticky; top: 0; z-index: 100; }
-        
-        /* واجهة الأقسام */
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; text-align: center; }
+        header { background: #000; padding: 15px; border-bottom: 3px solid var(--red); }
         .main-menu { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
-        .category-card { background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 25px 10px; text-align: center; cursor: pointer; transition: 0.3s; }
+        .category-card { background: var(--card); border: 1px solid #222; border-radius: 15px; padding: 25px 10px; cursor: pointer; }
         .category-card i { font-size: 40px; color: var(--red); display: block; margin-bottom: 10px; }
-        
-        /* قائمة القنوات */
         #content-list { display: none; padding: 20px; }
         .items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
-        .item { background: var(--card); border-radius: 10px; padding: 10px; text-align: center; border: 1px solid #222; }
-        .item img { width: 100%; height: 100px; object-fit: contain; border-radius: 5px; margin-bottom: 8px; }
-        .play-btn { background: var(--red); color: white; border: none; padding: 8px; width: 100%; border-radius: 5px; cursor: pointer; font-weight: bold; }
-
-        /* المشغل */
+        .item { background: var(--card); border-radius: 10px; padding: 10px; border: 1px solid #222; }
+        .item img { width: 100%; height: 90px; object-fit: contain; }
+        .play-btn { background: var(--red); color: white; border: none; padding: 8px; width: 100%; border-radius: 5px; margin-top: 5px; cursor: pointer; }
         #player-overlay { display: none; position: fixed; inset: 0; background: #000; z-index: 9999; flex-direction: column; }
-        video { width: 100%; height: auto; max-height: 80vh; background: #000; }
-        .back-btn { background: #333; color: white; border: none; padding: 10px; width: 100%; cursor: pointer; font-size: 16px; }
-        
-        .loading { display: none; color: var(--red); padding: 20px; text-align: center; }
+        video { width: 100%; height: auto; background: #000; }
+        .loading { display: none; color: var(--red); padding: 20px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="player-overlay">
     <video id="basidi-video" controls autoplay playsinline></video>
-    <button class="back-btn" onclick="closePlayer()">✕ العودة للقائمة</button>
+    <button onclick="closePlayer()" style="padding:15px; background:#333; color:white; border:none; width:100%;">✕ إغلاق المشغل</button>
 </div>
 
-<header>
-    <h2 id="nav-title">BASIDI <span style="color:var(--red)">V6</span> PRO</h2>
-</header>
+<header><h2>BASIDI <span style="color:var(--red)">V6</span> PRO</h2></header>
 
 <div id="main-ui" class="main-menu">
     <div class="category-card" onclick="fetchData('live')"><i class='bx bx-tv'></i><span>قنوات مباشرة</span></div>
@@ -50,88 +40,68 @@
     <div class="category-card" onclick="location.reload()"><i class='bx bx-refresh'></i><span>تحديث</span></div>
 </div>
 
+<div id="loader" class="loading">جاري الاتصال بالسيرفر...</div>
+
 <div id="content-list">
-    <button onclick="backToMenu()" style="color:var(--red); background:none; border:none; margin-bottom:15px; cursor:pointer;"><i class='bx bx-arrow-back'></i> رجوع</button>
+    <button onclick="backToMenu()" style="color:white; background:var(--red); border:none; padding:10px; margin-bottom:15px; border-radius:5px;">🔙 رجوع للقائمة</button>
     <div id="items-container" class="items-grid"></div>
 </div>
 
-<div id="loader" class="loading">جاري جلب البيانات...</div>
-
 <script>
     const config = { h: "http://bufsetn.live:8080", u: "VaRumDmgRh", p: "hopeful5sex" };
+    // جسر بديل لتجاوز مشاكل الاتصال
     const proxy = "https://api.allorigins.win/raw?url=";
     let hls = new Hls();
 
     async function fetchData(mode) {
         $("#main-ui").hide();
-        $("#content-list").hide();
         $("#loader").show();
         
-        let action = mode === 'live' ? 'get_live_streams' : (mode === 'vod' ? 'get_vod_streams' : 'get_series');
-        let url = `${config.h}/player_api.php?username=${config.u}&password=${config.p}&action=${action}`;
-        
+        const action = mode === 'live' ? 'get_live_streams' : (mode === 'vod' ? 'get_vod_streams' : 'get_series');
+        const apiUrl = `${config.h}/player_api.php?username=${config.u}&password=${config.p}&action=${action}`;
+
         try {
-            const response = await fetch(proxy + encodeURIComponent(url));
-            const data = await response.json();
-            displayItems(data, mode);
-        } catch (error) {
-            alert("حدث خطأ في جلب البيانات");
-            backToMenu();
+            const resp = await fetch(proxy + encodeURIComponent(apiUrl));
+            if (!resp.ok) throw new Error();
+            const data = await resp.json();
+            $("#loader").hide();
+            $("#content-list").show();
+            render(data, mode);
+        } catch (e) {
+            $("#loader").hide();
+            $("#main-ui").show();
+            alert("خطأ: السيرفر لا يستجيب حالياً. حاول مرة أخرى.");
         }
     }
 
-    function displayItems(items, mode) {
-        $("#loader").hide();
-        $("#content-list").show();
+    function render(data, mode) {
         let html = "";
-        
-        // عرض أول 50 عنصر فقط لتسريع الصفحة
-        items.slice(0, 50).forEach(item => {
-            let img = item.stream_icon || item.cover || 'https://via.placeholder.com/150/000000/FFFFFF?text=BASIDI';
-            let id = item.stream_id || item.series_id;
+        data.slice(0, 60).forEach(item => {
+            let img = item.stream_icon || item.cover || 'https://via.placeholder.com/100/222/white?text=BASIDI';
             html += `
                 <div class="item">
-                    <img src="${img}" onerror="this.src='https://via.placeholder.com/150/222/white?text=No+Image'">
-                    <p style="font-size:12px; height:30px; overflow:hidden;">${item.name}</p>
-                    <button class="play-btn" onclick="playMedia('${id}', '${mode}', '${item.container_extension}')">▶ تشغيل</button>
-                </div>
-            `;
+                    <img src="${img}">
+                    <p style="font-size:11px; height:25px; overflow:hidden;">${item.name}</p>
+                    <button class="play-btn" onclick="play('${item.stream_id || item.series_id}', '${mode}', '${item.container_extension}')">▶ تشغيل</button>
+                </div>`;
         });
         $("#items-container").html(html);
     }
 
-    function playMedia(id, mode, ext) {
+    function play(id, mode, ext) {
         $("#player-overlay").css("display", "flex");
-        const video = document.getElementById('basidi-video');
-        let streamUrl = "";
+        const v = document.getElementById('basidi-video');
+        let url = (mode === 'live') ? `${config.h}/live/${config.u}/${config.p}/${id}.ts` : `${config.h}/movie/${config.u}/${config.p}/${id}.${ext || 'mp4'}`;
         
-        if(mode === 'live') streamUrl = `${config.h}/live/${config.u}/${config.p}/${id}.ts`;
-        else if(mode === 'vod') streamUrl = `${config.h}/movie/${config.u}/${config.p}/${id}.${ext || 'mp4'}`;
-
         if (Hls.isSupported()) {
-            hls.destroy();
-            hls = new Hls();
-            hls.loadSource(streamUrl);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        } else {
-            video.src = streamUrl;
-            video.play();
-        }
+            hls.destroy(); hls = new Hls();
+            hls.loadSource(url); hls.attachMedia(v);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => v.play());
+        } else { v.src = url; v.play(); }
     }
 
-    function closePlayer() {
-        const video = document.getElementById('basidi-video');
-        video.pause();
-        hls.destroy();
-        $("#player-overlay").hide();
-    }
-
-    function backToMenu() {
-        $("#content-list").hide();
-        $("#loader").hide();
-        $("#main-ui").show();
-    }
+    function closePlayer() { document.getElementById('basidi-video').pause(); $("#player-overlay").hide(); hls.destroy(); }
+    function backToMenu() { $("#content-list").hide(); $("#main-ui").show(); }
 </script>
 </body>
 </html>
