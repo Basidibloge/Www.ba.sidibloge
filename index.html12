@@ -2,47 +2,145 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Basidi Live - الموقع الرسمي</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>BASIDI V6 PRO</title>
+    
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+
     <style>
-        :root { --gold: #ffcc00; --bg: #0b0f19; --blue: #051630; }
-        body { margin: 0; background: var(--bg); color: white; font-family: system-ui, sans-serif; text-align: center; line-height: 1.6; }
-        .header { background: var(--blue); padding: 25px 15px; border-bottom: 4px solid var(--gold); }
-        h1 { color: var(--gold); font-size: 2.2rem; margin: 0; }
-        .description-box { padding: 20px; max-width: 700px; margin: 20px auto; background: #161b22; border-radius: 15px; text-align: right; border: 1px solid #30363d; }
-        .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 15px; max-width: 500px; margin: auto; }
-        .gallery img { width: 100%; border-radius: 10px; border: 2px solid #333; }
-        .download-btn { 
-            display: inline-block; background: var(--gold); color: #000; padding: 18px 50px; 
-            border-radius: 50px; font-size: 1.5rem; font-weight: bold; text-decoration: none;
-            margin: 30px 0; box-shadow: 0 8px 20px rgba(255,204,0,0.3);
+        :root { --red: #e31e24; --bg: #0a0a0a; --card: #161616; }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow-x: hidden; }
+
+        /* شاشة المشغل */
+        #player-page { 
+            display: none; position: fixed; inset: 0; background: #000; z-index: 9999; 
+            flex-direction: column; align-items: center; justify-content: center;
         }
+        #basidi-video { width: 100%; max-height: 100vh; background: #000; }
+        .close-player { 
+            position: absolute; top: 20px; right: 20px; z-index: 10000;
+            background: var(--red); color: white; border: none; 
+            padding: 12px 20px; border-radius: 5px; font-weight: bold; cursor: pointer;
+        }
+
+        /* واجهة Basidi */
+        header { background: #000; padding: 20px; text-align: center; border-bottom: 3px solid var(--red); }
+        #main-ui { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; padding: 20px; }
+        .tile { 
+            background: var(--card); border: 1px solid #222; border-radius: 15px; 
+            padding: 30px 10px; text-align: center; cursor: pointer;
+        }
+        .tile i { font-size: 40px; color: var(--red); display: block; margin-bottom: 10px; }
+
+        /* القائمة والبحث */
+        .page { display: none; position: fixed; inset: 0; background: var(--bg); z-index: 3000; overflow-y: auto; padding-top: 70px; }
+        .search-bar { position: fixed; top: 0; width: 100%; background: #111; padding: 10px; display: flex; gap: 10px; z-index: 3100; border-bottom: 1px solid var(--red); }
+        .search-bar input { flex: 1; background: #222; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; outline: none; }
+        
+        .items-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; padding: 20px; }
+        .channel-card { background: var(--card); border-radius: 12px; padding: 15px; text-align: center; border: 1px solid #222; }
+        .channel-card img { width: 100%; height: 90px; object-fit: contain; border-radius: 8px; margin-bottom: 10px; }
+        .play-btn { background: var(--red); color: white; border: none; padding: 10px; width: 100%; border-radius: 5px; font-weight: bold; cursor: pointer; }
+        
+        .footer-code { text-align: center; padding: 20px; color: #555; font-size: 12px; }
     </style>
 </head>
 <body>
 
-    <div class="header">
-        <h1>Basidi Live</h1>
-        <p>مشاهدة القنوات العالمية والمغربية مجاناً</p>
+<div id="player-page">
+    <button class="close-player" onclick="closeVideo()">✕ إغلاق</button>
+    <video id="basidi-video" controls autoplay playsinline></video>
+</div>
+
+<header>
+    <h2 style="margin:0;">BASIDI <span style="color:var(--red)">V6</span> PRO</h2>
+</header>
+
+<div id="main-ui">
+    <div class="tile" onclick="loadCategory('live')"><i class='bx bx-tv'></i><span>قنوات مباشرة</span></div>
+    <div class="tile" onclick="loadCategory('live', 'sport')"><i class='bx bx-football'></i><span>باقة الرياضة</span></div>
+    <div class="tile" onclick="loadCategory('vod')"><i class='bx bx-film'></i><span>الأفلام</span></div>
+    <div class="tile" onclick="loadCategory('series')"><i class='bx bx-collection'></i><span>المسلسلات</span></div>
+</div>
+
+<div id="page-list" class="page">
+    <div class="search-bar">
+        <button onclick="hidePage()" style="background:transparent; color:white; border:none; font-size:24px;"><i class='bx bx-arrow-back'></i></button>
+        <input type="text" id="search-input" placeholder="بحث...">
     </div>
+    <div id="content-grid" class="items-grid"></div>
+</div>
 
-    <div class="description-box">
-        <p>تطبيق <strong>Basidi Live</strong> هو وجهتك المثالية لمشاهدة القنوات المباشرة، حيث يتميز بواجهة احترافية تنظم الباقات العالمية والمحلية بشكل يسهل الوصول إليه. </p>
-        <p>يقدم التطبيق قسمًا خاصًا وشاملًا للقنوات المغربية يضم القناة الأولى، دوزيم، والرياضية بجودات متعددة تضمن الاستمرارية. </p>
-        <p>كما يوفر باقة <strong>beIN SPORTS</strong> كاملة بجميع جوداتها لتناسب كافة سرعات الإنترنت وتضمن مشاهدة المباريات بلا تقطيع. </p>
-        <p>ولمحبي الترفيه، يتضمن التطبيق أقسامًا متنوعة مثل باقة <strong>Shahid</strong> التي تعرض أقوى المسلسلات والأفلام والبرامج الحصرية. </p>
-    </div>
+<div class="footer-code">Code: basidiia</div>
 
-    <div class="gallery">
-        <img src="https://d.top4top.io/p_3695kpg3k1.jpg"  alt="القائمة">
-        <img src="https://e.top4top.io/p_3695rle532.jpg" alt="المغرب">
-        <img src="https://f.top4top.io/p_3695x26v03.jpg" alt="بي ان">
-        <img src="https://c.top4top.io/p_3695m2qbu0.jpg" alt="شاهد">
-    </div>
+<script>
+    const server = { h: "http://bufsetn.live:8080", u: "VaRumDmgRh", p: "hopeful5sex" };
+    let currentData = [];
+    let currentMode = '';
+    const video = document.getElementById('basidi-video');
+    let hls = new Hls();
 
-    <a href="https://www.mediafire.com/file/4lh1xbg2ydr7o9y/Basidi.live+.apk/file" class="download-btn">تحميل APK الآن</a>
+    function hidePage() { $('#page-list').hide(); }
 
-    <footer style="padding: 20px; color: #555;">Basidi Live © 2026</footer>
+    async function loadCategory(mode, filter) {
+        currentMode = mode;
+        $('#page-list').show();
+        $('#content-grid').html("<p>جاري تحميل الأقسام...</p>");
+        
+        const action = mode === 'live' ? 'get_live_categories' : (mode === 'vod' ? 'get_vod_categories' : 'get_series_categories');
+        const res = await fetch(`${server.h}/player_api.php?username=${server.u}&password=${server.p}&action=${action}`);
+        let cats = await res.json();
+        if(filter === 'sport') cats = cats.filter(c => c.category_name.toLowerCase().includes('sport'));
 
+        $('#content-grid').html(cats.map(c => `
+            <div class="channel-card" onclick="loadItems('${c.category_id}', '${mode}')">
+                <i class='bx bx-folder' style="font-size:50px; color:var(--red)"></i>
+                <p>${c.category_name}</p>
+            </div>
+        `).join(''));
+    }
+
+    async function loadItems(catId, mode) {
+        $('#content-grid').html("<p>جاري التحميل...</p>");
+        const action = mode === 'live' ? 'get_live_streams' : (mode === 'vod' ? 'get_vod_streams' : 'get_series');
+        const res = await fetch(`${server.h}/player_api.php?username=${server.u}&password=${server.p}&action=${action}&category_id=${catId}`);
+        currentData = await res.json();
+        renderItems(currentData, mode);
+    }
+
+    function renderItems(data, mode) {
+        $('#content-grid').html(data.map(i => `
+            <div class="channel-card">
+                <img src="${i.stream_icon || i.cover || ''}" onerror="this.src='https://via.placeholder.com/100?text=BASIDI'">
+                <p style="font-size:11px; height:30px; overflow:hidden;">${i.name}</p>
+                <button class="play-btn" onclick="openVideo('${i.stream_id || i.series_id}', '${i.container_extension}')">▶ تشغيل</button>
+            </div>
+        `).join(''));
+    }
+
+    function openVideo(id, ext) {
+        $('#player-page').css('display', 'flex');
+        let url = (currentMode === 'live') ? `${server.h}/live/${server.u}/${server.p}/${id}.ts` : `${server.h}/movie/${server.u}/${server.p}/${id}.${ext || 'mp4'}`;
+        
+        if (Hls.isSupported()) {
+            hls.destroy();
+            hls = new Hls();
+            hls.loadSource(url);
+            hls.attachMedia(video);
+            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+        } else {
+            video.src = url;
+            video.play();
+        }
+    }
+
+    function closeVideo() {
+        video.pause();
+        hls.destroy();
+        $('#player-page').hide();
+    }
+</script>
 </body>
 </html>
