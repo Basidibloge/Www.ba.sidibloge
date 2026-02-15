@@ -3,64 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BASIDI V6 MANUAL</title>
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <title>BASIDI LIVE PRO - Red Edition</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        body { background: #0a0a0a; color: white; font-family: sans-serif; text-align: center; margin: 0; }
-        header { background: #000; padding: 20px; border-bottom: 3px solid #e31e24; }
-        .container { padding: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .chan-card { background: #161616; border: 1px solid #333; padding: 20px; border-radius: 10px; cursor: pointer; }
-        .chan-card:hover { border-color: #e31e24; }
-        #player-box { display: none; position: fixed; inset: 0; background: #000; z-index: 100; flex-direction: column; }
-        video { width: 100%; height: 80vh; background: #000; }
-        .btn-close { background: #e31e24; color: white; border: none; padding: 15px; font-weight: bold; cursor: pointer; }
+        :root {
+            --main-red: #e60000;
+            --bg-dark: #0a0a0a;
+            --card-sport: #FFD700;
+            --card-live: #00E5FF;
+            --card-movie: #76FF03;
+            --card-series: #D500F9;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 40px;
+        }
+
+        /* الهيدر */
+        .header { padding: 15px; font-size: 26px; font-weight: bold; }
+        .header span { color: var(--main-red); }
+
+        /* منطقة المشغل */
+        .video-container {
+            width: 95%;
+            max-width: 800px;
+            border: 3px solid var(--main-red);
+            border-radius: 15px;
+            overflow: hidden;
+            background: #000;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(230, 0, 0, 0.3);
+        }
+        video { width: 100%; display: block; aspect-ratio: 16/9; }
+
+        /* الأقسام الملونة */
+        .sections-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            width: 95%;
+            margin-bottom: 25px;
+        }
+        .section-btn {
+            border: none;
+            padding: 15px 5px;
+            border-radius: 10px;
+            font-weight: bold;
+            font-size: 14px;
+            cursor: pointer;
+            color: #000;
+            transition: 0.2s;
+        }
+        .s-sport { background: var(--card-sport); }
+        .s-live { background: var(--card-live); }
+        .s-movie { background: var(--card-movie); }
+        .s-series { background: var(--card-series); }
+
+        /* قائمة الباقات المرتبة باللون الأحمر */
+        .packages-title {
+            align-self: flex-start;
+            margin-right: 5%;
+            margin-bottom: 10px;
+            font-size: 18px;
+            color: var(--main-red);
+            font-weight: bold;
+            border-right: 4px solid var(--main-red);
+            padding-right: 10px;
+        }
+
+        .packages-list {
+            width: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .package-item {
+            background-color: #1a1a1a;
+            border: 1px solid #333;
+            border-right: 5px solid var(--main-red); /* علامة حمراء جانبية */
+            padding: 15px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .package-item:hover {
+            background-color: var(--main-red);
+            color: white;
+        }
+
+        .package-name { font-weight: bold; font-size: 16px; }
+        .package-icon { color: var(--main-red); }
+        .package-item:hover .package-icon { color: white; }
+
     </style>
 </head>
 <body>
 
-<div id="player-box">
-    <video id="video-player" controls autoplay></video>
-    <button class="btn-close" onclick="closeVideo()">✕ إغلاق القناة</button>
-</div>
+    <div class="header">BASIDI <span>V6</span> PRO</div>
 
-<header><h1>BASIDI <span style="color:#e31e24">V6</span> PRO</h1></header>
+    <div class="video-container" id="playerBox">
+        <video id="videoPlayer" controls autoplay poster="https://via.placeholder.com/800x450/000?text=Basidi+Live"></video>
+    </div>
 
-<div class="container">
-    <div class="chan-card" onclick="playChan('1500')">📺 قناة تجريبية 1</div>
-    <div class="chan-card" onclick="playChan('1501')">📺 قناة تجريبية 2</div>
-    <div class="chan-card" onclick="playChan('1502')">📺 قناة تجريبية 3</div>
-    <div class="chan-card" onclick="playChan('1503')">📺 قناة تجريبية 4</div>
-</div>
+    <div class="sections-container">
+        <button class="section-btn s-sport" onclick="updateUI('var(--card-sport)')">⚽ رياضة</button>
+        <button class="section-btn s-live" onclick="updateUI('var(--card-live)')">📡 مباشر</button>
+        <button class="section-btn s-movie" onclick="updateUI('var(--card-movie)')">🎬 أفلام</button>
+        <button class="section-btn s-series" onclick="updateUI('var(--card-series)')">📺 دراما</button>
+    </div>
 
-<script>
-    const hls = new Hls();
-    const server = "http://bufsetn.live:8080";
-    const user = "VaRumDmgRh";
-    const pass = "hopeful5sex";
+    <div class="packages-title">قائمة الباقات المتاحة</div>
+    <div class="packages-list">
+        <div class="package-item" onclick="playStream('رابط_باقة_1')">
+            <span class="package-name">🔴 باقة BEIN SPORT</span>
+            <span class="package-icon">◀</span>
+        </div>
+        <div class="package-item" onclick="playStream('رابط_باقة_2')">
+            <span class="package-name">🔴 باقة SSC الرياضية</span>
+            <span class="package-icon">◀</span>
+        </div>
+        <div class="package-item" onclick="playStream('رابط_باقة_3')">
+            <span class="package-name">🔴 باقة قنوات OSN</span>
+            <span class="package-icon">◀</span>
+        </div>
+        <div class="package-item" onclick="playStream('رابط_باقة_4')">
+            <span class="package-name">🔴 القنوات المغربية</span>
+            <span class="package-icon">◀</span>
+        </div>
+    </div>
 
-    function playChan(id) {
-        $("#player-box").css("display", "flex");
-        const video = document.getElementById('video-player');
-        const streamUrl = `${server}/live/${user}/${pass}/${id}.ts`;
+    <script>
+        const video = document.getElementById('videoPlayer');
+        const playerBox = document.getElementById('playerBox');
+        let hls = new Hls();
 
-        if (Hls.isSupported()) {
-            hls.destroy();
-            hls.loadSource(streamUrl);
-            hls.attachMedia(video);
-            hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
-        } else {
-            video.src = streamUrl;
-            video.play();
+        function playStream(url) {
+            if (Hls.isSupported()) {
+                hls.destroy();
+                hls = new Hls();
+                hls.loadSource(url);
+                hls.attachMedia(video);
+                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play());
+            } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                video.src = url;
+                video.play();
+            }
         }
-    }
 
-    function closeVideo() {
-        const video = document.getElementById('video-player');
-        video.pause();
-        hls.destroy();
-        $("#player-box").hide();
-    }
-</script>
+        function updateUI(color) {
+            playerBox.style.borderColor = color;
+        }
+    </script>
 </body>
 </html>
