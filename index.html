@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BASIDI LIVE PRO - Red Edition</title>
+    <title>BASIDI V6 PRO - Final Version</title>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
         :root {
-            --main-red: #e60000;
-            --bg-dark: #0a0a0a;
+            --red: #ff0000;
+            --bg: #050505;
             --card-sport: #FFD700;
             --card-live: #00E5FF;
             --card-movie: #76FF03;
@@ -16,47 +16,47 @@
         }
 
         body {
-            background-color: var(--bg-dark);
+            background-color: var(--bg);
             color: white;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding-bottom: 40px;
+            padding-bottom: 50px;
         }
 
         /* الهيدر */
-        .header { padding: 15px; font-size: 26px; font-weight: bold; }
-        .header span { color: var(--main-red); }
+        .header { padding: 20px; font-size: 28px; font-weight: 900; }
+        .header span { color: var(--red); }
 
         /* منطقة المشغل */
         .video-container {
             width: 95%;
             max-width: 800px;
-            border: 3px solid var(--main-red);
+            border: 3px solid var(--red);
             border-radius: 15px;
             overflow: hidden;
             background: #000;
             margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(230, 0, 0, 0.3);
+            box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
         }
-        video { width: 100%; display: block; aspect-ratio: 16/9; }
+        video { width: 100%; display: block; aspect-ratio: 16/9; background: #000; }
 
         /* الأقسام الملونة */
-        .sections-container {
+        .sections-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
+            gap: 8px;
             width: 95%;
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
         .section-btn {
             border: none;
-            padding: 15px 5px;
-            border-radius: 10px;
+            padding: 12px 5px;
+            border-radius: 8px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 13px;
             cursor: pointer;
             color: #000;
             transition: 0.2s;
@@ -66,90 +66,125 @@
         .s-movie { background: var(--card-movie); }
         .s-series { background: var(--card-series); }
 
-        /* قائمة الباقات المرتبة باللون الأحمر */
-        .packages-title {
-            align-self: flex-start;
-            margin-right: 5%;
-            margin-bottom: 10px;
-            font-size: 18px;
-            color: var(--main-red);
-            font-weight: bold;
-            border-right: 4px solid var(--main-red);
-            padding-right: 10px;
-        }
-
-        .packages-list {
+        /* قائمة القنوات (التي تظهر من الباقة) */
+        #channelsContainer {
+            display: none;
             width: 95%;
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .package-item {
-            background-color: #1a1a1a;
+            background: #111;
             border: 1px solid #333;
-            border-right: 5px solid var(--main-red); /* علامة حمراء جانبية */
+            border-radius: 10px;
             padding: 15px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s;
+        }
+        .channels-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .channel-item {
+            background: #222;
+            color: white;
+            border: 1px solid #444;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+        .channel-item:hover { background: var(--red); }
+
+        /* الباقات الحمراء */
+        .packages-list { width: 95%; display: flex; flex-direction: column; gap: 10px; }
+        .package-item {
+            background: #1a1a1a;
+            border-right: 6px solid var(--red);
+            padding: 18px;
             border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             cursor: pointer;
-            transition: 0.3s;
+            font-weight: bold;
         }
+        .package-item:active { transform: scale(0.98); background: var(--red); }
 
-        .package-item:hover {
-            background-color: var(--main-red);
-            color: white;
-        }
-
-        .package-name { font-weight: bold; font-size: 16px; }
-        .package-icon { color: var(--main-red); }
-        .package-item:hover .package-icon { color: white; }
-
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
 </head>
 <body>
 
     <div class="header">BASIDI <span>V6</span> PRO</div>
 
-    <div class="video-container" id="playerBox">
-        <video id="videoPlayer" controls autoplay poster="https://via.placeholder.com/800x450/000?text=Basidi+Live"></video>
+    <div class="video-container" id="mainPlayer">
+        <video id="video" controls autoplay playsinline></video>
     </div>
 
-    <div class="sections-container">
-        <button class="section-btn s-sport" onclick="updateUI('var(--card-sport)')">⚽ رياضة</button>
-        <button class="section-btn s-live" onclick="updateUI('var(--card-live)')">📡 مباشر</button>
-        <button class="section-btn s-movie" onclick="updateUI('var(--card-movie)')">🎬 أفلام</button>
-        <button class="section-btn s-series" onclick="updateUI('var(--card-series)')">📺 دراما</button>
+    <div class="sections-grid">
+        <button class="section-btn s-sport">⚽ رياضة</button>
+        <button class="section-btn s-live">📡 مباشر</button>
+        <button class="section-btn s-movie">🎬 أفلام</button>
+        <button class="section-btn s-series">📺 دراما</button>
     </div>
 
-    <div class="packages-title">قائمة الباقات المتاحة</div>
+    <div id="channelsContainer">
+        <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <span id="pkgTitle" style="color:var(--red); font-weight:bold;">القنوات</span>
+            <button onclick="document.getElementById('channelsContainer').style.display='none'" style="background:none; color:white; border:none; cursor:pointer;">إغلاق X</button>
+        </div>
+        <div class="channels-grid" id="channelsList"></div>
+    </div>
+
     <div class="packages-list">
-        <div class="package-item" onclick="playStream('رابط_باقة_1')">
-            <span class="package-name">🔴 باقة BEIN SPORT</span>
-            <span class="package-icon">◀</span>
+        <div class="package-item" onclick="fetchChannels('LINK_SERVER_1', 'باقة BEIN SPORT')">
+            <span>🔴 باقة BEIN SPORT</span>
+            <span>◀</span>
         </div>
-        <div class="package-item" onclick="playStream('رابط_باقة_2')">
-            <span class="package-name">🔴 باقة SSC الرياضية</span>
-            <span class="package-icon">◀</span>
+        <div class="package-item" onclick="fetchChannels('LINK_SERVER_2', 'باقة SSC SPORT')">
+            <span>🔴 باقة SSC الرياضية</span>
+            <span>◀</span>
         </div>
-        <div class="package-item" onclick="playStream('رابط_باقة_3')">
-            <span class="package-name">🔴 باقة قنوات OSN</span>
-            <span class="package-icon">◀</span>
-        </div>
-        <div class="package-item" onclick="playStream('رابط_باقة_4')">
-            <span class="package-name">🔴 القنوات المغربية</span>
-            <span class="package-icon">◀</span>
+        <div class="package-item" onclick="fetchChannels('LINK_SERVER_3', 'القنوات المغربية')">
+            <span>🔴 القنوات المغربية</span>
+            <span>◀</span>
         </div>
     </div>
 
     <script>
-        const video = document.getElementById('videoPlayer');
-        const playerBox = document.getElementById('playerBox');
+        const video = document.getElementById('video');
         let hls = new Hls();
 
-        function playStream(url) {
+        // دالة جلب القنوات من السيرفر
+        async function fetchChannels(apiUrl, name) {
+            const container = document.getElementById('channelsContainer');
+            const list = document.getElementById('channelsList');
+            document.getElementById('pkgTitle').innerText = name;
+            
+            list.innerHTML = '<p>جاري تحميل القنوات...</p>';
+            container.style.display = 'block';
+
+            try {
+                // ملاحظة: استبدل apiUrl برابط السيرفر الحقيقي
+                // هنا نضع بيانات تجريبية لمحاكاة السيرفر
+                const mockData = [
+                    { n: name + " - قناة 1", u: "https://test-streams.mux.dev/x36xhzz/main.m3u8" },
+                    { n: name + " - قناة 2", u: "https://test-streams.mux.dev/x36xhzz/main.m3u8" }
+                ];
+
+                list.innerHTML = '';
+                mockData.forEach(ch => {
+                    const btn = document.createElement('div');
+                    btn.className = 'channel-item';
+                    btn.innerText = ch.n;
+                    btn.onclick = () => playSource(ch.u);
+                    list.appendChild(btn);
+                });
+            } catch (e) {
+                list.innerHTML = '<p>خطأ في الاتصال بالسيرفر</p>';
+            }
+        }
+
+        // دالة تشغيل البث
+        function playSource(url) {
             if (Hls.isSupported()) {
                 hls.destroy();
                 hls = new Hls();
@@ -160,10 +195,7 @@
                 video.src = url;
                 video.play();
             }
-        }
-
-        function updateUI(color) {
-            playerBox.style.borderColor = color;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
     </script>
 </body>
