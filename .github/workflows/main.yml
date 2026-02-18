@@ -1,23 +1,18 @@
 name: Basidi-Global-Hunter
 on:
   schedule:
-    - cron: '0 */2 * * *' # يعمل تلقائياً كل ساعتين لجلب أحدث الباقات
-  workflow_dispatch: # زر لتشغيله يدوياً وقتما تشاء
+    - cron: '0 */2 * * *'
+  workflow_dispatch:
 
 jobs:
   update_gist:
     runs-on: ubuntu-latest
     steps:
-      - name: تحديث البيانات تلقائياً
-        uses: exuanbo/gist-api-action@v2
-        with:
-          gist_id: 23d0584fe31dcce4b78ab41116bbb147
-          gist_token: ${{ secrets.GIST_TOKEN }}
-          file_path: Config.jonson
-          file_content: |
-            {
-              "host": "http://power-server.net:8080",
-              "user": "BASIDI_AUTO_HUNT",
-              "pass": "GLOBAL_2026",
-              "info": "تم تحديث الباقات العربية والفرنسية بنجاح بنظام الأتمتة"
-            }
+      - name: تحديث البيانات تلقائياً لكل الباقات
+        run: |
+          curl -L -X PATCH \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GIST_TOKEN }}" \
+            -H "X-GitHub-Api-Version: 2022-11-28" \
+            https://api.github.com/gists/23d0584fe31dcce4b78ab41116bbb147 \
+            -d '{"files":{"Config.jonson":{"content":"{\n  \"host\": \"http://power-server.net:8080\",\n  \"user\": \"BASIDI_AUTO\",\n  \"pass\": \"GLOBAL_2026\",\n  \"info\": \"تم تحديث الباقات العربية والفرنسية بنجاح\"\n}"}}}'
