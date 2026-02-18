@@ -1,4 +1,4 @@
-name: Basidi-Hunter
+name: السيرفرات الشهيرة
 on:
   workflow_dispatch:
 jobs:
