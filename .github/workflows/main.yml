@@ -1,1 +1,12 @@
-curl -L "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh" | bash
+name: Basidi-Hunter
+on:
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      - name: Run Hunt All
+        run: |
+          curl -L "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh" | bash
