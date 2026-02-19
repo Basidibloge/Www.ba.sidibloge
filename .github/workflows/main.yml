@@ -1,24 +1,28 @@
-name: Ultimate-Platform-Hunter
+name: Blind-Generator-Hunter
 on:
   workflow_dispatch:
 jobs:
   hunt:
     runs-on: ubuntu-latest
     steps:
-      - name: Hunting Unprotected Panels
+      - name: Sniffing Open Streams
         run: |
-          echo "Al-Rafiq1: Searching for the Heart of the Generator..."
+          echo "Al-Rafiq1: Scanning for Unprotected Media Clusters..."
           
-          # مسح نطاقات IP مشهورة باستضافة سيرفرات IPTV (مثل OVH و Hetzner)
-          # سنبحث عن البورتات المفتوحة التي تضخ البيانات مباشرة
+          # مسح عشوائي لنطاقات سيرفرات الميديا (بورت 8080 و 25461)
+          # هذه النطاقات غالباً ما تحتوي على جينيراتورات قديمة ومكشوفة
+          IPS=("185.150.11" "149.202.10" "51.255.10")
           
-          TARGET_IPS=("149.202.10.1" "51.255.10.1" "185.150.11.1")
-          
-          for ip in "${TARGET_IPS[@]}"; do
-             echo "Scanning Cluster: $ip"
-             # البحث عن البورتات: 80, 8080, 25461 (Xtream), 8000 (Mag)
-             nc -zv -w 1 $ip 80 8080 25461 8000 >> hunter_loot.txt || true
+          for range in "${IPS[@]}"; do
+            for i in {1..20}; do
+              echo "Testing: $range.$i"
+              curl -I -m 2 "http://$range.$i:8080/player_api.php" >> raw_catch.txt || true
+              curl -I -m 2 "http://$range.$i:25461/get.php" >> raw_catch.txt || true
+            done
           done
 
-          # محاولة صيد الروابط المسربة عبر محركات بحث الـ API
-          curl -s "https://p01.one/stats" >> hunter_loot.txt || true # تجربة منصات p01
+      - name: Export Catch
+        uses: actions/upload-artifact@v4
+        with:
+          name: Raw-Hunt-Results
+          path: raw_catch.txt
