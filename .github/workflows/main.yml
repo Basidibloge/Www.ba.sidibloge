@@ -1,4 +1,4 @@
-name: hunter
+name: Global-Hunter
 on:
   workflow_dispatch:
 jobs:
@@ -7,6 +7,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Run Ziz Hunt
+      - name: Hunting Servers
         run: |
-          curl -sL "https://raw.githubusercontent.com/ziz-tcl/hunter/main/hunt.sh" | bash
+          # هذا الرابط هو الأحدث حالياً لجلب سيرفرات IPTV و Xtream
+          curl -sL "https://raw.githubusercontent.com/alireza0/iptv/master/sh/hunt.sh" | bash || \
+          curl -sL "https://raw.githubusercontent.com/yousif-iptv/hunter/main/hunt.sh" | bash
