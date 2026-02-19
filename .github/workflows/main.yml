@@ -1,36 +1,24 @@
-name: Vision-Global-Extractor
+name: Fast-Vision-Hunter
 on:
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Extract All Packages
+      - name: Quick Scan
         run: |
-          echo "AI is extracting all server data from Vision/SmartX2 ecosystem..."
+          echo "AI: Starting Fast Mode..."
+          # تحديد وقت الاتصال بـ 20 ثانية فقط لكل أمر لتجنب التعليق
+          curl -m 20 -A "SmartX2" -sL "https://www.vision.co.ma/application.htm" > links.txt || true
           
-          # 1. سحب جميع روابط تطبيقات الرسيفرات (Smart+, Smart X2, UCAST, ECAST)
-          curl -sL "https://www.vision.co.ma/application.htm" | grep -oP 'http[s]?://[^"]+' > All_Vision_Apps.txt || true
+          # محاولة سريعة لجلب الباقة باستخدام كودك
+          curl -m 20 -A "SmartX2" -sL "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o vip_data.m3u || true
           
-          # 2. محاكاة طلب جلب "كل الباقات" (All Categories) من سيرفر vsn.one
-          # نستخدم هيدر التطبيق الأصلي لإقناع السيرفر بإعطائنا القائمة الكاملة
-          curl -H "User-Agent: SmartX2/3.6.1" \
-               -sL "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus" \
-               -o Global_VIP_Package.m3u || true
-
-          # 3. استخراج سيرفرات Xtream المخفية للأجهزة المختلفة
-          echo "Scanning for Xtream Hosts..."
-          echo "Host 1: http://smart-x2.com:8080" >> Extracted_Servers.txt
-          echo "Host 2: http://vsn.one:8080" >> Extracted_Servers.txt
-          echo "Host 3: http://vision.co.ma:8080" >> Extracted_Servers.txt
-
-      - name: Upload Global Treasure
+          echo "Scan Done."
+      - name: Upload
         uses: actions/upload-artifact@v4
         with:
-          name: Vision-Master-Data
+          name: Quick-Treasure
           path: |
-            *.m3u
-            *.txt
+            links.txt
+            vip_data.m3u
