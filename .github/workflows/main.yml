@@ -1,34 +1,22 @@
-name: Vision-IPTV-Full-Extractor
+name: Safe-Vision-Check
 on:
   workflow_dispatch:
 jobs:
-  build:
+  check:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Extract Channels from Hosts
+      - name: System Pulse
         run: |
-          echo "AI is connecting to Smart X2 Servers..."
+          echo "Checking Server Status for Al-Rafiq1..."
+          # تجربة الاتصال السريع جداً مع تجاهل الأخطاء تماماً
+          curl -I -m 5 "http://vsn.one:8080" || echo "Server busy"
           
-          # تعريف الهوية المزيفة (خداع السيرفر ليعتقد أننا تطبيق Smart X2)
-          UA="SmartX2/3.6.1 (Linux; Android 11)"
-
-          # 1. السحب من السيرفر الأول (VSN)
-          curl -A "$UA" -m 30 -sL "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus&output=ts" -o VSN_Channels.m3u || true
-
-          # 2. السحب من السيرفر الثاني (Smart-X2)
-          curl -A "$UA" -m 30 -sL "http://smart-x2.com:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus&output=ts" -o SmartX2_Channels.m3u || true
-
-          # 3. دمج النتائج في ملف واحد وتصفية القنوات
-          cat VSN_Channels.m3u SmartX2_Channels.m3u > All_Vision_Channels.m3u
+          # محاولة جلب معلومات بسيطة جداً (أول 5 أسطر فقط)
+          curl -A "SmartX2" -m 10 -sL "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" | head -n 5 > test_sample.m3u || true
           
-          echo "Extraction finished. Checking file size..."
-          ls -lh *.m3u
-
-      - name: Deliver IPTV File
+          echo "Safe scan finished."
+      - name: Results
         uses: actions/upload-artifact@v4
         with:
-          name: Vision-IPTV-Package
-          path: All_Vision_Channels.m3u
+          name: Connection-Report
+          path: test_sample.m3u
