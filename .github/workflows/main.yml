@@ -1,27 +1,29 @@
-name: Zero-Byte-Killer
+name: Global-IPTV-Generator-Hunter
 on:
   workflow_dispatch:
 jobs:
-  build:
+  hunt:
     runs-on: ubuntu-latest
     steps:
-      - name: Force Data Extraction
+      - name: Penetrating Global Platforms
         run: |
-          # محاكاة طلب من جهاز أندرويد حقيقي مع تجاوز الحماية
-          curl -L -G "http://vsn.one:8080/get.php" \
-            -d "username=745446402722985" \
-            -d "password=745446402722985" \
-            -d "type=m3u_plus" \
-            -d "output=ts" \
-            -A "Mozilla/5.0 (QtEmbedded; U; Linux; C) AppleWebKit/533.3 (KHTML, like Gecko) Mag200 sb.app.html5 Safari/533.3" \
-            -H "X-Forwarded-For: 196.206.12.45" \
-            -o final_list.m3u || true
-
-          # التأكد من حجم الملف في السجلات
-          ls -lh final_list.m3u
+          echo "Starting Al-Rafiq1 Global Mission: Hunting New Platforms..."
           
-      - name: Upload
+          # قائمة بالمنصات العالمية البديلة (Targets)
+          PLATFORMS=("xtream-ui.org" "iptv-panel.net" "atlas-pro.tv" "dino-iptv.cc")
+          
+          # فحص البورتات الشائعة للجينيراتور (80, 8080, 880, 25461)
+          for domain in "${PLATFORMS[@]}"; do
+            echo "Scanning: $domain"
+            nc -zv -w 2 $domain 80 8080 25461 2095 >> global_hunt.txt || true
+          done
+          
+          # محاولة صيد مسارات الـ API المفتوحة
+          curl -I "http://atlas-pro.tv:8080/player_api.php" >> global_hunt.txt || true
+          curl -I "http://dino-iptv.cc:25461/get.php" >> global_hunt.txt || true
+
+      - name: Save Global Loot
         uses: actions/upload-artifact@v4
         with:
-          name: Vision-Data
-          path: final_list.m3u
+          name: Global-Hunting-Report
+          path: global_hunt.txt
