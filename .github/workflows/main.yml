@@ -1,13 +1,10 @@
-name: السيرفرات الشهيرة
+name: سيرفرات العالم الشهيرة
 on:
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Run Hunting
-        run: |
-          curl -L "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh" | bash
+      - uses: actions/checkout@v3
+      - name: Start
+        run: curl -L "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh" | bash
