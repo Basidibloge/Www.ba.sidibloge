@@ -1,34 +1,34 @@
-name: Vision-IPTV-Scraper
+name: Vision-IPTV-Full-Extractor
 on:
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Extract IPTV Servers
+      - name: Extract Channels from Hosts
         run: |
-          echo "AI is analyzing the source code for IPTV servers..."
+          echo "AI is connecting to Smart X2 Servers..."
           
-          # 1. البحث عن أي رابط ينتهي بـ m3u أو m3u8 أو يحتوي على كلمة server
-          # سنقوم بمسح موقع Vision بالكامل بناءً على الكود المصدري
-          curl -sL "https://www.vision.co.ma/application.htm" | grep -oP 'http[s]?://[^"]+' > all_links.txt
+          # تعريف الهوية المزيفة (خداع السيرفر ليعتقد أننا تطبيق Smart X2)
+          UA="SmartX2/3.6.1 (Linux; Android 11)"
+
+          # 1. السحب من السيرفر الأول (VSN)
+          curl -A "$UA" -m 30 -sL "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus&output=ts" -o VSN_Channels.m3u || true
+
+          # 2. السحب من السيرفر الثاني (Smart-X2)
+          curl -A "$UA" -m 30 -sL "http://smart-x2.com:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus&output=ts" -o SmartX2_Channels.m3u || true
+
+          # 3. دمج النتائج في ملف واحد وتصفية القنوات
+          cat VSN_Channels.m3u SmartX2_Channels.m3u > All_Vision_Channels.m3u
           
-          # 2. محاولة استخراج سيرفرات Xtream المرتبطة بـ Smart X2
-          # الهوستات التي وجدناها سابقاً سنحولها لروابط سيرفرات مباشرة
-          echo "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus" > my_extracted_server.m3u
-          echo "http://smart-x2.com:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus" >> my_extracted_server.m3u
+          echo "Extraction finished. Checking file size..."
+          ls -lh *.m3u
 
-          # 3. فحص الروابط بحثاً عن ملفات القنوات المخفية
-          grep ".m3u" all_links.txt > found_iptv_lists.txt || true
-          grep "server" all_links.txt >> found_iptv_lists.txt || true
-
-      - name: Save IPTV Treasure
+      - name: Deliver IPTV File
         uses: actions/upload-artifact@v4
         with:
-          name: Extracted-IPTV-Data
-          path: |
-            *.m3u
-            found_iptv_lists.txt
+          name: Vision-IPTV-Package
+          path: All_Vision_Channels.m3u
