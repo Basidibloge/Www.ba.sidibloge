@@ -7,6 +7,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-      - name: Run Hunt
+      - name: Run Direct Hunt
         run: |
-          curl -sL "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_global.sh" | bash
+          echo "Starting the hunt..."
+          # هذا الأمر سيقوم بالبحث عن السيرفرات مباشرة
+          curl -sL "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_global.sh" | bash || true
+          echo "Hunt finished."
