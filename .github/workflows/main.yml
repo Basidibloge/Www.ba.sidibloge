@@ -1,24 +1,25 @@
-name: Fast-Vision-Hunter
+name: Global-Host-Unlocker
 on:
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Quick Scan
+      - name: Try All Hosts
         run: |
-          echo "AI: Starting Fast Mode..."
-          # تحديد وقت الاتصال بـ 20 ثانية فقط لكل أمر لتجنب التعليق
-          curl -m 20 -A "SmartX2" -sL "https://www.vision.co.ma/application.htm" > links.txt || true
+          echo "AI is testing the 3 Hosts for Al-Rafiq1..."
           
-          # محاولة سريعة لجلب الباقة باستخدام كودك
-          curl -m 20 -A "SmartX2" -sL "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o vip_data.m3u || true
+          # تجربة السيرفر الأول
+          curl -m 15 -A "SmartX2" "http://smart-x2.com:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o SmartX2_Host.m3u || true
           
-          echo "Scan Done."
-      - name: Upload
+          # تجربة السيرفر الثاني (الأقوى حالياً)
+          curl -m 15 -A "SmartX2" "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o VSN_Host.m3u || true
+          
+          # تجربة السيرفر الثالث (موقع فيزيون)
+          curl -m 15 -A "SmartX2" "http://vision.co.ma:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o Vision_Host.m3u || true
+
+      - name: Upload Final Results
         uses: actions/upload-artifact@v4
         with:
-          name: Quick-Treasure
-          path: |
-            links.txt
-            vip_data.m3u
+          name: All-Hosts-Package
+          path: "*.m3u"
