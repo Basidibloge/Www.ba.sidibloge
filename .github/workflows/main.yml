@@ -9,6 +9,4 @@ jobs:
         uses: actions/checkout@v3
       - name: Run Hunt
         run: |
-          curl -sL "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh" > hunt.sh
-          chmod +x hunt.sh
-          ./hunt.sh
+          curl -sL "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt.sh" | bash
