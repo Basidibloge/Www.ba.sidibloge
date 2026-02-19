@@ -1,29 +1,24 @@
-name: Global-IPTV-Generator-Hunter
+name: Ultimate-Platform-Hunter
 on:
   workflow_dispatch:
 jobs:
   hunt:
     runs-on: ubuntu-latest
     steps:
-      - name: Penetrating Global Platforms
+      - name: Hunting Unprotected Panels
         run: |
-          echo "Starting Al-Rafiq1 Global Mission: Hunting New Platforms..."
+          echo "Al-Rafiq1: Searching for the Heart of the Generator..."
           
-          # قائمة بالمنصات العالمية البديلة (Targets)
-          PLATFORMS=("xtream-ui.org" "iptv-panel.net" "atlas-pro.tv" "dino-iptv.cc")
+          # مسح نطاقات IP مشهورة باستضافة سيرفرات IPTV (مثل OVH و Hetzner)
+          # سنبحث عن البورتات المفتوحة التي تضخ البيانات مباشرة
           
-          # فحص البورتات الشائعة للجينيراتور (80, 8080, 880, 25461)
-          for domain in "${PLATFORMS[@]}"; do
-            echo "Scanning: $domain"
-            nc -zv -w 2 $domain 80 8080 25461 2095 >> global_hunt.txt || true
+          TARGET_IPS=("149.202.10.1" "51.255.10.1" "185.150.11.1")
+          
+          for ip in "${TARGET_IPS[@]}"; do
+             echo "Scanning Cluster: $ip"
+             # البحث عن البورتات: 80, 8080, 25461 (Xtream), 8000 (Mag)
+             nc -zv -w 1 $ip 80 8080 25461 8000 >> hunter_loot.txt || true
           done
-          
-          # محاولة صيد مسارات الـ API المفتوحة
-          curl -I "http://atlas-pro.tv:8080/player_api.php" >> global_hunt.txt || true
-          curl -I "http://dino-iptv.cc:25461/get.php" >> global_hunt.txt || true
 
-      - name: Save Global Loot
-        uses: actions/upload-artifact@v4
-        with:
-          name: Global-Hunting-Report
-          path: global_hunt.txt
+          # محاولة صيد الروابط المسربة عبر محركات بحث الـ API
+          curl -s "https://p01.one/stats" >> hunter_loot.txt || true # تجربة منصات p01
