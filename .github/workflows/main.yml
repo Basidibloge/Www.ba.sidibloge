@@ -5,5 +5,5 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - run: curl -L https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh | bash
+      - name: hunt
+        run: curl -L https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh | bash
