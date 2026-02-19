@@ -1,25 +1,34 @@
-name: Global-Host-Unlocker
+name: Vision-IPTV-Scraper
 on:
   workflow_dispatch:
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Try All Hosts
-        run: |
-          echo "AI is testing the 3 Hosts for Al-Rafiq1..."
-          
-          # تجربة السيرفر الأول
-          curl -m 15 -A "SmartX2" "http://smart-x2.com:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o SmartX2_Host.m3u || true
-          
-          # تجربة السيرفر الثاني (الأقوى حالياً)
-          curl -m 15 -A "SmartX2" "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o VSN_Host.m3u || true
-          
-          # تجربة السيرفر الثالث (موقع فيزيون)
-          curl -m 15 -A "SmartX2" "http://vision.co.ma:8080/get.php?username=745446402722985&password=745446402722985&type=m3u" -o Vision_Host.m3u || true
+      - name: Checkout
+        uses: actions/checkout@v3
 
-      - name: Upload Final Results
+      - name: Extract IPTV Servers
+        run: |
+          echo "AI is analyzing the source code for IPTV servers..."
+          
+          # 1. البحث عن أي رابط ينتهي بـ m3u أو m3u8 أو يحتوي على كلمة server
+          # سنقوم بمسح موقع Vision بالكامل بناءً على الكود المصدري
+          curl -sL "https://www.vision.co.ma/application.htm" | grep -oP 'http[s]?://[^"]+' > all_links.txt
+          
+          # 2. محاولة استخراج سيرفرات Xtream المرتبطة بـ Smart X2
+          # الهوستات التي وجدناها سابقاً سنحولها لروابط سيرفرات مباشرة
+          echo "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus" > my_extracted_server.m3u
+          echo "http://smart-x2.com:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus" >> my_extracted_server.m3u
+
+          # 3. فحص الروابط بحثاً عن ملفات القنوات المخفية
+          grep ".m3u" all_links.txt > found_iptv_lists.txt || true
+          grep "server" all_links.txt >> found_iptv_lists.txt || true
+
+      - name: Save IPTV Treasure
         uses: actions/upload-artifact@v4
         with:
-          name: All-Hosts-Package
-          path: "*.m3u"
+          name: Extracted-IPTV-Data
+          path: |
+            *.m3u
+            found_iptv_lists.txt
