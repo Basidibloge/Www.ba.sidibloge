@@ -1,4 +1,4 @@
-name: سيرفرات العالم الشهيرة
+name: hunter
 on:
   workflow_dispatch:
 jobs:
@@ -6,5 +6,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Start
-        run: curl -L "https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh" | bash
+      - run: curl -L https://raw.githubusercontent.com/Basidibloge/Basidi-Global-Hunter/main/hunt_all.sh | bash
