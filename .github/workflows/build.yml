@@ -1,0 +1,16 @@
+name: Build webOS IPK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install webOS CLI
+        run: npm install -g @webosose/ares-cli
+      - name: Package IPK
+        run: ares-package . -o ./build
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BasidiPro-IPK
+          path: ./build/*.ipk
