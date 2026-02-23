@@ -1,0 +1,9 @@
+{
+    "id": "com.basidi.pro",
+    "version": "1.0.0",
+    "vendor": "Al-Rafiq1",
+    "type": "web",
+    "main": "index.html",
+    "title": "BASIDI PRO",
+    "icon": "icon.png"
+}
